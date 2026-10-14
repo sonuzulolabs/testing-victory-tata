@@ -55,13 +55,18 @@ function propsFromTracking(drive: ActiveInstantTracking): VisitTrackingActivityP
 }
 
 function resolveInstance(): LiveActivity<VisitTrackingActivityProps> | null {
-  if (cachedInstance) return cachedInstance;
   const active = VisitTrackingActivity.getInstances();
   if (active.length > 0) {
     cachedInstance = active[0];
     return cachedInstance;
   }
+  cachedInstance = null;
   return null;
+}
+
+/** Keep content fresh on the lock screen (ActivityKit stale handling). */
+function staleDateForActiveTracking(): Date {
+  return new Date(Date.now() + 45 * 60_000);
 }
 
 export function registerVisitStatusNotifeeHandlers(): void {
@@ -110,12 +115,19 @@ export async function showVisitStatusNotification(
           : 0;
 
   const existing = resolveInstance();
+  const staleDate = staleDateForActiveTracking();
   if (existing) {
-    await existing.update(props);
+    await existing.update(props, staleDate);
     return;
   }
 
-  cachedInstance = VisitTrackingActivity.start(props, 'adityadesign://test-drive');
+  cachedInstance = VisitTrackingActivity.start(props, 'adityadesign://test-drive', staleDate);
+
+  // ActivityKit + permission sheet: refresh content after the system UI settles.
+  await new Promise((resolve) => setTimeout(resolve, 700));
+  if (cachedInstance) {
+    await cachedInstance.update(props, staleDate).catch(() => {});
+  }
 
   if (driveId > 0 && typeof payload !== 'number' && 'customer_phone' in payload && cachedInstance) {
     const phone = mobileDigitsFromStored(payload.customer_phone);

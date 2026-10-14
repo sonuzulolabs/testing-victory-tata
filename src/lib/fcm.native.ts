@@ -3,6 +3,7 @@ import { Platform } from 'react-native';
 
 import { registerTestingDeviceToken } from '@/lib/api/testing';
 import { ensurePostNotificationsPermission } from '@/lib/notification-permission';
+import { emitPostNotificationsReady } from '@/lib/post-notifications-ready';
 import { updateFromInstantDrivePushData } from '@/lib/visit-status-notification';
 
 function getMessaging(): FirebaseMessagingTypes.Module | null {
@@ -22,10 +23,14 @@ async function ensurePermission(): Promise<boolean> {
   if (!mod) return false;
 
   const status = await mod.requestPermission();
-  return (
+  const allowed =
     status === messaging.AuthorizationStatus.AUTHORIZED ||
-    status === messaging.AuthorizationStatus.PROVISIONAL
-  );
+    status === messaging.AuthorizationStatus.PROVISIONAL;
+  if (allowed) {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    emitPostNotificationsReady();
+  }
+  return allowed;
 }
 
 export async function syncFcmDeviceToken(phone: string): Promise<void> {

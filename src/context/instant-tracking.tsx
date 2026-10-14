@@ -183,7 +183,7 @@ export function InstantTrackingProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let cancelled = false;
     let timeout: ReturnType<typeof setTimeout> | undefined;
-    const delayMs = Platform.OS === 'android' ? 700 : 400;
+    const delayMs = Platform.OS === 'android' ? 700 : notifPermissionTick > 0 ? 900 : 500;
 
     const task = InteractionManager.runAfterInteractions(() => {
       timeout = setTimeout(() => {
@@ -225,6 +225,28 @@ export function InstantTrackingProvider({ children }: { children: ReactNode }) {
 
     return () => clearInterval(id);
   }, [active?.id, active?.status]);
+
+  /**
+   * Blinkit-style persistence: re-show if the user dismissed the shade (Android) or Live Activity (iOS).
+   * iOS still allows swipe-to-dismiss per Apple HIG; we restart while the drive is tracking.
+   */
+  useEffect(() => {
+    if (!active || active.status !== 'tracking') return;
+
+    const id = setInterval(() => {
+      void showVisitStatusNotification(active);
+    }, 20_000);
+
+    return () => clearInterval(id);
+  }, [
+    active?.id,
+    active?.status,
+    active?.eta_minutes,
+    active?.initial_eta_minutes,
+    active?.eta_started_at,
+    active?.address,
+    active?.car,
+  ]);
 
   const value = useMemo(
     () => ({

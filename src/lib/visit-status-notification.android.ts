@@ -83,8 +83,9 @@ async function ensureChannel(): Promise<void> {
     id: CHANNEL_ID,
     name: 'Test drive visit',
     description: 'Live ETA while your test drive is on the way',
-    importance: AndroidImportance.DEFAULT,
+    importance: AndroidImportance.HIGH,
     vibration: false,
+    badge: false,
   });
   channelReady = true;
 }
@@ -128,6 +129,7 @@ async function displayVisitNotification(payload: VisitStatusPayload): Promise<vo
       ongoing: true,
       autoCancel: false,
       onlyAlertOnce: true,
+      localOnly: true,
       flags: [AndroidFlags.FLAG_NO_CLEAR],
       pressAction: { id: 'default', launchActivity: 'default' },
       smallIcon: SMALL_ICON,

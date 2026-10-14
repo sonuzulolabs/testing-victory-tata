@@ -1,11 +1,5 @@
-import { HStack, Image, ProgressView, Text, VStack } from '@expo/ui/swift-ui';
-import {
-  activityBackgroundTint,
-  font,
-  foregroundStyle,
-  frame,
-  padding,
-} from '@expo/ui/swift-ui/modifiers';
+import { HStack, Text, VStack } from '@expo/ui/swift-ui';
+import { font, foregroundStyle, padding } from '@expo/ui/swift-ui/modifiers';
 import { createLiveActivity, type LiveActivityEnvironment } from 'expo-widgets';
 
 export type VisitTrackingActivityProps = {
@@ -17,8 +11,8 @@ export type VisitTrackingActivityProps = {
   carLabel: string;
 };
 
-const BRAND = '#0A1848';
 const ACCENT = '#B8F035';
+const WHITE = '#FFFFFF';
 const MUTED = '#9CA3AF';
 
 const VisitTrackingActivity = (
@@ -27,113 +21,62 @@ const VisitTrackingActivity = (
 ) => {
   'widget';
 
-  const props = {
-    etaMinutes: Number(rawProps?.etaMinutes ?? 0),
-    arrivalLabel: String(rawProps?.arrivalLabel ?? '—'),
-    addressLine: String(rawProps?.addressLine ?? 'Test drive on the way'),
-    lastUpdatedLabel: String(rawProps?.lastUpdatedLabel ?? 'Updated now'),
-    progress: Number(rawProps?.progress ?? 0),
-    carLabel: String(rawProps?.carLabel ?? 'Concierge test drive'),
-  };
+  const etaMinutes = Number(rawProps?.etaMinutes ?? 0);
+  const etaDisplay = etaMinutes <= 0 ? '0' : String(etaMinutes);
+  const addressLine = String(rawProps?.addressLine ?? 'Test drive on the way');
+  const arrivalLabel = String(rawProps?.arrivalLabel ?? '—');
+  const lastUpdatedLabel = String(rawProps?.lastUpdatedLabel ?? 'Updated now');
+  const carLabel = String(rawProps?.carLabel ?? 'Concierge test drive');
+  const progressPct = Math.round(Math.min(1, Math.max(0, Number(rawProps?.progress ?? 0))) * 100);
 
-  const progress = Math.min(1, Math.max(0, props.progress));
-  const etaDisplay = props.etaMinutes <= 0 ? '0' : String(props.etaMinutes);
-  const progressPct = Math.round(progress * 100);
-
-  const bannerCard = (
-    <VStack
-      spacing={10}
-      modifiers={[padding({ all: 14 }), activityBackgroundTint('#1C1C1E')]}>
-      <HStack alignment="center">
-        <HStack spacing={8} alignment="center" modifiers={[frame({ maxWidth: Infinity })]}>
-          <VStack
-            alignment="center"
-            modifiers={[
-              frame({ width: 28, height: 28 }),
-              padding({ all: 4 }),
-              foregroundStyle(BRAND),
-            ]}>
-            <Image systemName="car.side.fill" color="#FFFFFF" />
-          </VStack>
-          <Text modifiers={[font({ weight: 'bold', size: 13 }), foregroundStyle('#FFFFFF')]}>
-            Victory Tata
-          </Text>
-        </HStack>
-        <Text modifiers={[font({ size: 11 }), foregroundStyle(MUTED)]}>{props.lastUpdatedLabel}</Text>
-      </HStack>
-
-      <Text modifiers={[font({ size: 13, weight: 'bold' }), foregroundStyle('#FFFFFF')]}>
-        {props.addressLine}
-      </Text>
-
-      <ProgressView value={progress} modifiers={[frame({ maxWidth: Infinity, height: 8 })]} />
-
+  const banner = (
+    <VStack spacing={8} modifiers={[padding({ all: 14 })]}>
       <HStack spacing={8}>
-        <VStack alignment="center" spacing={2} modifiers={[frame({ maxWidth: Infinity })]}>
-          <HStack alignment="firstTextBaseline" spacing={2}>
-            <Text modifiers={[font({ weight: 'bold', size: 22 }), foregroundStyle('#FFFFFF')]}>
-              {etaDisplay}
-            </Text>
-            <Text modifiers={[font({ size: 11 }), foregroundStyle(MUTED)]}>min</Text>
-          </HStack>
-          <Text modifiers={[font({ size: 12 }), foregroundStyle(MUTED)]}>ETA</Text>
-        </VStack>
-        <VStack alignment="center" spacing={2} modifiers={[frame({ maxWidth: Infinity })]}>
-          <Text modifiers={[font({ weight: 'bold', size: 22 }), foregroundStyle('#FFFFFF')]}>
-            {props.arrivalLabel}
-          </Text>
-          <Text modifiers={[font({ size: 12 }), foregroundStyle(MUTED)]}>Arrival</Text>
-        </VStack>
-        <VStack alignment="center" spacing={2} modifiers={[frame({ maxWidth: Infinity })]}>
-          <HStack alignment="firstTextBaseline" spacing={2}>
-            <Text modifiers={[font({ weight: 'bold', size: 22 }), foregroundStyle('#FFFFFF')]}>
-              {String(progressPct)}
-            </Text>
-            <Text modifiers={[font({ size: 11 }), foregroundStyle(MUTED)]}>%</Text>
-          </HStack>
-          <Text modifiers={[font({ size: 12 }), foregroundStyle(MUTED)]}>Progress</Text>
-        </VStack>
+        <Text modifiers={[font({ weight: 'bold', size: 14 }), foregroundStyle(WHITE)]}>
+          Victory Tata · Test drive
+        </Text>
+        <Text modifiers={[font({ size: 11 }), foregroundStyle(MUTED)]}>{lastUpdatedLabel}</Text>
       </HStack>
-
-      <Text modifiers={[font({ size: 11 }), foregroundStyle(MUTED)]}>{props.carLabel}</Text>
+      <Text modifiers={[font({ weight: 'bold', size: 16 }), foregroundStyle(WHITE)]}>
+        {etaDisplay} min to arrival · by {arrivalLabel}
+      </Text>
+      <Text modifiers={[font({ size: 14 }), foregroundStyle(WHITE)]}>{addressLine}</Text>
+      <Text modifiers={[font({ size: 12 }), foregroundStyle(MUTED)]}>
+        {carLabel} · {progressPct}% complete
+      </Text>
     </VStack>
   );
 
   const bannerSmall = (
-    <VStack spacing={6} modifiers={[padding({ all: 10 }), activityBackgroundTint('#1C1C1E')]}>
-      <HStack alignment="center">
-        <Image systemName="car.side.fill" color={ACCENT} />
-        <Text modifiers={[font({ weight: 'bold', size: 12 }), foregroundStyle('#FFFFFF')]}>
-          {etaDisplay} min · {props.addressLine}
-        </Text>
-      </HStack>
-      <ProgressView value={progress} modifiers={[frame({ maxWidth: Infinity, height: 6 })]} />
+    <VStack spacing={4} modifiers={[padding({ all: 10 })]}>
+      <Text modifiers={[font({ weight: 'bold', size: 13 }), foregroundStyle(WHITE)]}>
+        {etaDisplay} min · {addressLine}
+      </Text>
     </VStack>
   );
 
   return {
-    banner: bannerCard,
+    banner,
     bannerSmall,
-    compactLeading: <Image systemName="car.side.fill" color={ACCENT} />,
+    compactLeading: (
+      <Text modifiers={[font({ weight: 'bold', size: 12 }), foregroundStyle(ACCENT)]}>VT</Text>
+    ),
     compactTrailing: (
       <Text modifiers={[font({ weight: 'bold', size: 14 }), foregroundStyle(ACCENT)]}>
         {etaDisplay}m
       </Text>
     ),
-    minimal: <Image systemName="car.side.fill" color={ACCENT} />,
-    expandedLeading: <Image systemName="car.side.fill" color={ACCENT} />,
+    minimal: (
+      <Text modifiers={[font({ weight: 'bold', size: 11 }), foregroundStyle(ACCENT)]}>{etaDisplay}m</Text>
+    ),
     expandedTrailing: (
-      <VStack alignment="trailing" spacing={2}>
-        <Text modifiers={[font({ weight: 'bold', size: 20 }), foregroundStyle('#FFFFFF')]}>
-          {etaDisplay} min
-        </Text>
-        <Text modifiers={[font({ size: 11 }), foregroundStyle(MUTED)]}>ETA</Text>
-      </VStack>
+      <Text modifiers={[font({ weight: 'bold', size: 18 }), foregroundStyle(WHITE)]}>
+        {etaDisplay} min
+      </Text>
     ),
     expandedBottom: (
       <VStack spacing={4} modifiers={[padding({ horizontal: 12 })]}>
-        <Text modifiers={[font({ size: 12 }), foregroundStyle(MUTED)]}>{props.addressLine}</Text>
-        <ProgressView value={progress} />
+        <Text modifiers={[font({ size: 12 }), foregroundStyle(MUTED)]}>{addressLine}</Text>
       </VStack>
     ),
   };

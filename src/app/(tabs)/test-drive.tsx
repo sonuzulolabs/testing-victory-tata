@@ -181,7 +181,6 @@ export default function TestDriveScreen() {
       const customerName = booking.guestName || profile?.name.trim() || 'Customer';
 
       if (booking.scheduleMode === 'now') {
-        await syncPushTokenForPhone(customerPhone);
         const instant = await submitInstantTestDrive({
           customerName,
           customerPhone,
@@ -190,6 +189,7 @@ export default function TestDriveScreen() {
         });
         setActiveFromBooking(instant);
         void refreshInstantTracking();
+        void syncPushTokenForPhone(customerPhone);
         const ride = createRideFromBooking(bookingOffer, date, time, {
           ...booking,
           service: 'concierge',
