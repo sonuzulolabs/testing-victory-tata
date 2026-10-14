@@ -1,0 +1,41 @@
+{
+  "cli": {
+    "version": ">= 24.8.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "environment": "development",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://victorytata.zulolabs.com",
+        "EXPO_PUBLIC_API_KEY": "vcrm_3E6g6CQwrEyEaEY9UOXWd5ZiM6k5OzSW2AGB5m1JNkKwtZ0m",
+        "EXPO_PUBLIC_FIREBASE_FORCE_RECAPTCHA": "1"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "environment": "preview",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://victorytata.zulolabs.com",
+        "EXPO_PUBLIC_API_KEY": "vcrm_3E6g6CQwrEyEaEY9UOXWd5ZiM6k5OzSW2AGB5m1JNkKwtZ0m",
+        "EXPO_PUBLIC_FIREBASE_FORCE_RECAPTCHA": "1"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "environment": "production",
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://victorytata.zulolabs.com",
+        "EXPO_PUBLIC_API_KEY": "vcrm_3E6g6CQwrEyEaEY9UOXWd5ZiM6k5OzSW2AGB5m1JNkKwtZ0m"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
